@@ -1,0 +1,92 @@
+﻿@model gozon.frontend.Models.DashboardViewModel
+@{
+    ViewData["Title"] = "Магазин Гоzон";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4">🛍️ Gogon Shop</h1>
+    <p>Текущий пользователь: <strong>@Model.UserId</strong></p>
+    
+    <form asp-action="ChangeUser" method="post" class="d-inline-flex gap-2">
+        <input type="text" name="userId" class="form-control form-control-sm" placeholder="Введите UUID" style="width:300px">
+        <button type="submit" class="btn btn-sm btn-outline-secondary">Сменить</button>
+    </form>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">💰 Кошелек</div>
+            <div class="card-body text-center">
+                <h2 class="mb-4">Баланс: @Model.Balance</h2>
+                
+                <div class="d-grid gap-2">
+                    <form asp-action="CreateAccount" method="post">
+                        <button class="btn btn-outline-primary w-100">🆕 Создать счет</button>
+                    </form>
+
+                    <form asp-action="TopUp" method="post" class="input-group">
+                        <input type="number" name="topUpAmount" class="form-control" placeholder="Сумма" value="1000">
+                        <button class="btn btn-success">Пополнить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">🛒 Новый заказ</div>
+            <div class="card-body">
+                <form asp-action="CreateOrder" method="post">
+                    <div class="mb-3">
+                        <label>Описание</label>
+                        <input type="text" name="orderDescription" class="form-control" value="Подарок" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Цена</label>
+                        <input type="number" name="orderAmount" class="form-control" value="100" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Купить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">📜 Ваши заказы <a href="/" class="btn btn-sm btn-link float-end">Обновить</a></div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Описание</th>
+                    <th>Сумма</th>
+                    <th>Статус</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td><small>@order.Id</small></td>
+                        <td>@order.Description</td>
+                        <td>@order.Amount</td>
+                        <td>
+                            @if(order.Status == 0) { <span class="badge bg-secondary">New</span> }
+                            else if(order.Status == 1) { <span class="badge bg-success">Finished</span> }
+                            else { <span class="badge bg-danger">Cancelled</span> }
+                        </td>
+                        <td>@order.CreatedAt.ToLocalTime()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @if (!Model.Orders.Any())
+        {
+            <p class="text-muted text-center mt-3">Заказов пока нет</p>
+        }
+    </div>
+</div>
